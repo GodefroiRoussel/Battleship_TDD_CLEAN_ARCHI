@@ -1,0 +1,30 @@
+Fonctionnalités attendues :
+
+Je veux pouvoir choisir mon type de partie (contre une IA ou contre un humain)
+Je dois pouvoir placer mes bateaux (5 bateaux dans une grille 10x10 avec un bateau de 2, deux bateaux de 3, un bateau de 4 et de 5)
+Je ne peux pas placer mes bateaux à l'extérieur de la grille
+Je ne peux pas superposer 2 bateaux l'un sur l'autre
+
+Je dois pouvoir jouer une partie
+Je dois pouvoir tirer
+Je dois pouvoir consulter mes bateaux
+Je dois pouvoir consulter les endroits que j'ai déjà tiré
+Je ne dois pas pouvoir tiré sur une case déjà tiré
+
+Je dois savoir qui a gagné
+
+Ubiquitous langage : 
+
+BATEAU / GRILLE / CELLULE / JOUEUR / PARTIE 
+
+Grille composé de cellules
+Bateaux est sur des cellules
+Une grille a plusieurs bateaux
+Un joueur possède 2 grilles (une de ses bateaux et une de tir)
+Un joueur possède 5 bateaux
+Une partie possède 2 joueurs et se termine quand un joueur n'a plus de bateaux
+
+Par quoi commencé le TDD ? 
+
+Création d'une partie puis création d'un joueur puis placement des bateaux de ce joueur 
+et ainsi de suite on creuse
