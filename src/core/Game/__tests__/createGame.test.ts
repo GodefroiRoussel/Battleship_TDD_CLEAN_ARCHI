@@ -1,6 +1,6 @@
-import { Game, TypeGame } from './entity/game';
+import { Game, TypeGame } from '../domain/entity/game';
 import { InMemoryGameRepository } from '../adapters/in-memory/InMemoryGameRepository';
-import { CreateGameUsecase } from './createGameUsecase';
+import { CreateGameUsecase } from '../domain/use-cases/createGameUsecase';
 
 describe('Create Game tests', () => {
   describe('Scenario: Create a game', () => {

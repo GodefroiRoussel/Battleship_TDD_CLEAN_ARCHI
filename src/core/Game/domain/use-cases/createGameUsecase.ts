@@ -1,5 +1,5 @@
-import { Game } from './entity/game';
-import { IGameRepository } from './repository';
+import { Game } from '../entity/game';
+import { IGameRepository } from '../repository';
 
 export class CreateGameUsecase {
   constructor(private gameRepository: IGameRepository) {}
