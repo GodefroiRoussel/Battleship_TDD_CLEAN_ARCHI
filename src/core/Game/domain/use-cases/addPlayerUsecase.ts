@@ -15,6 +15,8 @@ export class AddPlayerUsecase {
       game.addPlayer1(player);
     } else if (!game.player2) {
       game.addPlayer2(player);
+    } else {
+      throw new Error('Cannot add a third player to this game');
     }
 
     await this.gameRepository.update(game);

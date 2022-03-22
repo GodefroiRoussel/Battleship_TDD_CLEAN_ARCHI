@@ -67,4 +67,15 @@ describe('Add a player to a game', () => {
     expect(gameExpectedWithTwoPLayers).toEqual(gameAfterAddPlayer);
     expect(gameExpectedWithTwoPLayers).toEqual(await inMemoryGameRepository.getById('id'));
   });
+
+  it('should not be able to add a third player to a game', async () => {
+    const firstPlayer = new Player('id1', 'name1');
+    const secondPlayer = new Player('id2', 'name2');
+    const game = new GameBuilder().withID('id').withPlayer1(firstPlayer).withPlayer2(secondPlayer).build();
+    const inMemoryGameRepository = new InMemoryGameRepository([game]);
+    const addPlayerUsecase = new AddPlayerUsecase(inMemoryGameRepository);
+    const playerToAdd = new Player('id3', 'name3');
+
+    expect(addPlayerUsecase.execute('id', playerToAdd)).rejects.toThrowError('Cannot add a third player to this game');
+  });
 });
