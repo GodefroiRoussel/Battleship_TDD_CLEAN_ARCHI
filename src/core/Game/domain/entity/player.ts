@@ -3,7 +3,7 @@ import { Grid } from './grid';
 import { Coordinate } from './coordinate';
 
 export class Player {
-  constructor(private _id: string, private _name: string, private _grid: Grid) {}
+  constructor(private _id: string, private _name: string, private _grid: Grid = new Grid([])) {}
 
   public get id(): string {
     return this._id;
