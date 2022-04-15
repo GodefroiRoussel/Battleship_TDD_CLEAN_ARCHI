@@ -1,7 +1,7 @@
 import { InMemoryGameRepository } from '../adapters/in-memory/InMemoryGameRepository';
 import { AddPlayerUsecase } from '../domain/use-cases/addPlayerUsecase';
 import { Player } from '../domain/entity/player';
-import { GameBuilder } from './GameBuilder';
+import { GameBuilder } from '../domain/entity/builder/gameBuilder';
 
 describe('Add a player to a game', () => {
   it('Should be able to add one player to a game', async () => {

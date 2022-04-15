@@ -1,6 +1,6 @@
-import { Game, TypeGame } from '../domain/entity/game';
-import { Player } from '../domain/entity/player';
-import { Grid } from './placeShip.test';
+import { Game, TypeGame } from '../game';
+import { Player } from '../player';
+import { Grid } from '../grid';
 
 export class GameBuilder {
   protected id: string;

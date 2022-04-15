@@ -1,41 +1,11 @@
 import { InMemoryGameRepository } from '../adapters/in-memory/InMemoryGameRepository';
 import { Game } from '../domain/entity/game';
 import { Player } from '../domain/entity/player';
-import { Coordinate, PlaceShipUsecase } from '../domain/use-cases/placeShipUsecase';
-import { StubGameBuilder } from './GameBuilder';
-
-export class Ship {
-  constructor(private coordinateStart: Coordinate, private coordinateEnd: Coordinate, private typeShip: string) {}
-}
-
-export class Grid {
-  constructor(private ships: Ship[]) {}
-
-  addShip(ship: Ship): void {
-    this.ships.push(ship);
-  }
-}
-
-class GridBuilder {
-  private ships: Ship[];
-
-  constructor() {
-    this.ships = [];
-  }
-
-  withFirstShip(ship: Ship): GridBuilder {
-    if (!this.ships?.[0]) {
-      this.ships.push(ship);
-      return this;
-    }
-    this.ships[0] = ship;
-    return this;
-  }
-
-  build(): Grid {
-    return new Grid(this.ships);
-  }
-}
+import { PlaceShipUsecase } from '../domain/use-cases/placeShipUsecase';
+import { Coordinate } from '../domain/entity/coordinate';
+import { StubGameBuilder } from '../domain/entity/builder/gameBuilder';
+import { Ship } from '../domain/entity/ship';
+import { GridBuilder } from '../domain/entity/builder/gridBuilder';
 
 let game: Game;
 let inMemoryGameRepository: InMemoryGameRepository;
