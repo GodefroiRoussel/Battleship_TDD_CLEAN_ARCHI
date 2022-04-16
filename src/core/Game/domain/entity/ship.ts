@@ -3,10 +3,10 @@ import { DIRECTION } from './direction';
 
 // The types of ships are:  Carrier (occupies 5 spaces, Cruiser (4),  Destroyer (3) and Submarine (2).
 export enum TYPE_SHIP {
-  SUBMARINE,
-  DESTROYER,
-  CRUISER,
-  CARRIER,
+  SUBMARINE = 'SUBMARINE',
+  DESTROYER = 'DESTROYER',
+  CRUISER = 'CRUISER',
+  CARRIER = 'CARRIER',
 }
 
 export class Ship {

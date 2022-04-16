@@ -106,7 +106,7 @@ describe('Scenario: During the start of a game, when I am the first player, I wa
     }),
   );
 
-  test.each(casesTypeShip)('should be able to add a ship of the type: %i', async (params) => {
+  test.each(casesTypeShip)('should be able to add a ship of the type: %s', async (params) => {
     // Arrange
     const { coordinates, typeShip } = params;
     const ship = new Ship(coordinates, typeShip);
