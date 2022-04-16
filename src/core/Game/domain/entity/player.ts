@@ -1,6 +1,7 @@
 import { Ship } from './ship';
 import { Grid } from './grid';
 import { Coordinate } from './coordinate';
+import { DIRECTION } from './direction';
 
 export class Player {
   constructor(private _id: string, private _name: string, private _grid: Grid = new Grid([])) {}
@@ -17,7 +18,7 @@ export class Player {
     return this._grid;
   }
 
-  addShip(typeShip: string, coordinatesStart: Coordinate, direction: string): void {
+  addShip(typeShip: string, coordinatesStart: Coordinate, direction: DIRECTION): void {
     const coordinateEnd = coordinatesStart.next(direction);
     const ship = new Ship(coordinatesStart, coordinateEnd, typeShip);
     this._grid.addShip(ship);

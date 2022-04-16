@@ -8,12 +8,8 @@ export class GridBuilder {
     this.ships = [];
   }
 
-  withFirstShip(ship: Ship): GridBuilder {
-    if (!this.ships?.[0]) {
-      this.ships.push(ship);
-      return this;
-    }
-    this.ships[0] = ship;
+  withShips(ships: Ship[]): GridBuilder {
+    this.ships = ships;
     return this;
   }
 

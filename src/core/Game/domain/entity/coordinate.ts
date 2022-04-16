@@ -1,16 +1,18 @@
+import { DIRECTION } from './direction';
+
 // C'est un value object !
 export class Coordinate {
   constructor(public readonly x: number, public readonly y: number) {}
 
-  next(direction: string): Coordinate {
+  next(direction: DIRECTION): Coordinate {
     switch (direction) {
-      case 'BOTTOM':
+      case DIRECTION.BOTTOM:
         return new Coordinate(this.x, this.y - 1);
 
-      case 'TOP':
+      case DIRECTION.TOP:
         return new Coordinate(this.x, this.y + 1);
 
-      case 'LEFT':
+      case DIRECTION.LEFT:
         return new Coordinate(this.x + -1, this.y);
 
       default:

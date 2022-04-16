@@ -7,6 +7,7 @@ import { StubGameBuilder } from '../domain/entity/builder/gameBuilder';
 import { Ship } from '../domain/entity/ship';
 import { GridBuilder } from '../domain/entity/builder/gridBuilder';
 import { Grid } from '../domain/entity/grid';
+import { DIRECTION } from '../domain/entity/direction';
 
 let game: Game;
 let inMemoryGameRepository: InMemoryGameRepository;
@@ -22,13 +23,13 @@ beforeEach(() => {
 
 describe('Scenario: During the start of a game, when I am the first player, I want to place my ships', () => {
   const cases = [
-    { coordinatesEnd: new Coordinate(6, 5), direction: 'RIGHT' },
-    { coordinatesEnd: new Coordinate(4, 5), direction: 'LEFT' },
-    { coordinatesEnd: new Coordinate(5, 6), direction: 'TOP' },
-    { coordinatesEnd: new Coordinate(5, 4), direction: 'BOTTOM' },
+    { coordinatesEnd: new Coordinate(6, 5), direction: DIRECTION.RIGHT },
+    { coordinatesEnd: new Coordinate(4, 5), direction: DIRECTION.LEFT },
+    { coordinatesEnd: new Coordinate(5, 6), direction: DIRECTION.TOP },
+    { coordinatesEnd: new Coordinate(5, 4), direction: DIRECTION.BOTTOM },
   ].map((testCase) =>
     Object.assign(testCase, {
-      toString: function (): string {
+      toString: function (): DIRECTION {
         return testCase.direction;
       },
     }),
@@ -40,7 +41,7 @@ describe('Scenario: During the start of a game, when I am the first player, I wa
       const { coordinatesEnd, direction } = params;
       const ship = new Ship(coordinatesStart, coordinatesEnd, 'little');
       const player = game.player1 as Player;
-      const gridExpected = new GridBuilder().withFirstShip(ship).build();
+      const gridExpected = new GridBuilder().withShips([ship]).build();
 
       // Act
       await placeShipUsecase.execute(game.id, player.id, 'little', coordinatesStart, direction);
@@ -54,12 +55,12 @@ describe('Scenario: During the start of a game, when I am the first player, I wa
 
   it('should no be able to place my ship if another ship already is on one of the coordinate', () => {
     // Arrange
-    const ship = new Ship(new Coordinate(5, 5), new Coordinate(6, 5), 'little');
+    const ship = new Ship(coordinatesStart, new Coordinate(6, 5), 'little');
     const player = new Player('id1', 'name1', new Grid([ship]));
     const game = new StubGameBuilder().withPlayer1(player).build();
     inMemoryGameRepository = new InMemoryGameRepository([game]);
     placeShipUsecase = new PlaceShipUsecase(inMemoryGameRepository);
-    const direction = 'RIGHT';
+    const direction = DIRECTION.RIGHT;
 
     // Act & Assert
     expect(placeShipUsecase.execute(game.id, player.id, 'little', coordinatesStart, direction)).rejects.toThrowError(

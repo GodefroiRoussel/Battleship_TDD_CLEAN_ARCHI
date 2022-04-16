@@ -1,5 +1,6 @@
 import { IGameRepository } from '../repository';
 import { Coordinate } from '../entity/coordinate';
+import { DIRECTION } from '../entity/direction';
 
 export class PlaceShipUsecase {
   constructor(private gameRepository: IGameRepository) {}
@@ -9,7 +10,7 @@ export class PlaceShipUsecase {
     idPlayer: string,
     typeShip: string,
     coordinatesStart: Coordinate,
-    direction: string,
+    direction: DIRECTION,
   ): Promise<void> {
     const game = await this.gameRepository.getById(idGame);
     if (!game) {
