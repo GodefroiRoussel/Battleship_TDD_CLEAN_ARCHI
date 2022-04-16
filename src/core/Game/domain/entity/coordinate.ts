@@ -17,4 +17,11 @@ export class Coordinate {
         return new Coordinate(this.x + 1, this.y);
     }
   }
+
+  equals(otherCoordinate: Coordinate): boolean {
+    if (this.x === otherCoordinate.x && this.y === otherCoordinate.y) {
+      return true;
+    }
+    return false;
+  }
 }

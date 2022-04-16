@@ -19,11 +19,15 @@ export class PlaceShipUsecase {
     if (!player) {
       throw new Error('It will never happen');
     }
-    player.addShip(typeShip, coordinatesStart, direction);
+
+    try {
+      player.addShip(typeShip, coordinatesStart, direction);
+    } catch (error) {
+      throw new Error('A ship is already on one of those coordinates');
+    }
     await this.gameRepository.update(game);
     // Question : Inside out / Outside In
     // Question : Est-ce qu'on peut avoir un repository par entité ?
     // Question : Builder pattern tous les arguments ?
-    // Question : Comment fonctionne le presenter ? Comment faire pour un usecase un peu complexe ? Pour la logique du placer exactement 5 bateaux
   }
 }
