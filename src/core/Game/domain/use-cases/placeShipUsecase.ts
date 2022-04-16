@@ -1,6 +1,7 @@
 import { IGameRepository } from '../repository';
 import { Coordinate, invalidCoordinateError } from '../entity/coordinate';
 import { DIRECTION } from '../entity/direction';
+import { TYPE_SHIP } from '../entity/ship';
 
 const shipOutsideTheGridError = new Error(
   'The ship cannot be placed at this coordinate and at this direction because it leaves the grid',
@@ -12,7 +13,7 @@ export class PlaceShipUsecase {
   async execute(
     idGame: string,
     idPlayer: string,
-    typeShip: string,
+    typeShip: TYPE_SHIP,
     coordinatesStart: Coordinate,
     direction: DIRECTION,
   ): Promise<void> {

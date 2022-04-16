@@ -1,4 +1,4 @@
-import { Ship } from './ship';
+import { Ship, TYPE_SHIP } from './ship';
 import { Grid } from './grid';
 import { Coordinate } from './coordinate';
 import { DIRECTION } from './direction';
@@ -18,9 +18,8 @@ export class Player {
     return this._grid;
   }
 
-  addShip(typeShip: string, coordinatesStart: Coordinate, direction: DIRECTION): void {
-    const coordinateEnd = coordinatesStart.next(direction);
-    const ship = new Ship(coordinatesStart, coordinateEnd, typeShip);
+  addShip(typeShip: TYPE_SHIP, coordinatesStart: Coordinate, direction: DIRECTION): void {
+    const ship = Ship.create(coordinatesStart, direction, typeShip);
     this._grid.addShip(ship);
   }
 }
