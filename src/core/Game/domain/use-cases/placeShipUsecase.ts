@@ -1,6 +1,10 @@
 import { IGameRepository } from '../repository';
-import { Coordinate } from '../entity/coordinate';
+import { Coordinate, invalidCoordinateError } from '../entity/coordinate';
 import { DIRECTION } from '../entity/direction';
+
+const shipOutsideTheGridError = new Error(
+  'The ship cannot be placed at this coordinate and at this direction because it leaves the grid',
+);
 
 export class PlaceShipUsecase {
   constructor(private gameRepository: IGameRepository) {}
@@ -18,13 +22,18 @@ export class PlaceShipUsecase {
     }
     const player = game.player1?.id === idPlayer ? game.player1 : game.player2;
     if (!player) {
-      throw new Error('It will never happen');
+      throw new Error('A game must have players to be played');
     }
 
     try {
       player.addShip(typeShip, coordinatesStart, direction);
     } catch (error) {
-      throw new Error('A ship is already on one of those coordinates');
+      switch (error) {
+        case invalidCoordinateError:
+          throw shipOutsideTheGridError;
+        default:
+          throw new Error('A ship is already on one of those coordinates');
+      }
     }
     await this.gameRepository.update(game);
     // Question : Inside out / Outside In

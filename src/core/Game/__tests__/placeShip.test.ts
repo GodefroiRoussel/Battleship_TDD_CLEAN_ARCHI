@@ -53,7 +53,7 @@ describe('Scenario: During the start of a game, when I am the first player, I wa
     },
   );
 
-  it('should no be able to place my ship if another ship already is on one of the coordinate', () => {
+  it('should not be able to place my ship if another ship already is on one of the coordinate', () => {
     // Arrange
     const ship = new Ship(coordinatesStart, new Coordinate(6, 5), 'little');
     const player = new Player('id1', 'name1', new Grid([ship]));
@@ -63,8 +63,21 @@ describe('Scenario: During the start of a game, when I am the first player, I wa
     const direction = DIRECTION.RIGHT;
 
     // Act & Assert
-    expect(placeShipUsecase.execute(game.id, player.id, 'little', coordinatesStart, direction)).rejects.toThrowError(
-      'A ship is already on one of those coordinates',
+    return expect(
+      placeShipUsecase.execute(game.id, player.id, 'little', coordinatesStart, direction),
+    ).rejects.toThrowError('A ship is already on one of those coordinates');
+  });
+
+  it('should not be able to place a ship outside of the grid', () => {
+    // Arrange
+    const player = game.player1 as Player;
+    const direction = DIRECTION.RIGHT;
+
+    // Act & Assert
+    return expect(
+      placeShipUsecase.execute(game.id, player.id, 'little', new Coordinate(10, 10), direction),
+    ).rejects.toThrowError(
+      'The ship cannot be placed at this coordinate and at this direction because it leaves the grid',
     );
   });
 });
