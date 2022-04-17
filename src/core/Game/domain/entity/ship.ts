@@ -10,7 +10,27 @@ export enum TYPE_SHIP {
 }
 
 export class Ship {
-  constructor(private _coordinates: Coordinate[], private _typeShip: TYPE_SHIP) {}
+  private _life: number;
+  constructor(private _coordinates: Coordinate[], private _typeShip: TYPE_SHIP) {
+    switch (_typeShip) {
+      case TYPE_SHIP.SUBMARINE:
+        this._life = 2;
+        break;
+      case TYPE_SHIP.DESTROYER:
+        this._life = 3;
+        break;
+      case TYPE_SHIP.CRUISER:
+        this._life = 4;
+        break;
+      case TYPE_SHIP.CARRIER:
+        this._life = 5;
+        break;
+
+      default:
+        this._life = 2;
+        break;
+    }
+  }
 
   public get coordinates(): Coordinate[] {
     return this._coordinates;
@@ -18,6 +38,10 @@ export class Ship {
 
   public get typeShip(): TYPE_SHIP {
     return this._typeShip;
+  }
+
+  public get life(): number {
+    return this._life;
   }
 
   public static create(coordinateStart: Coordinate, direction: DIRECTION, typeShip: TYPE_SHIP): Ship {
@@ -43,5 +67,9 @@ export class Ship {
       coordinates.push(tempCoordinate);
     }
     return new Ship(coordinates, typeShip);
+  }
+
+  public shot(): void {
+    this._life -= 1;
   }
 }

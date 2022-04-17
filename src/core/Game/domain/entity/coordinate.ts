@@ -37,3 +37,14 @@ export class Coordinate {
     return false;
   }
 }
+
+export enum TYPE_COORDINATE {
+  TOUCHED = 'TOUCHED',
+  WATER = 'WATER',
+}
+
+export class CoordinateShot extends Coordinate {
+  constructor(public x: number, public y: number, public typeCoordinate: TYPE_COORDINATE) {
+    super(x, y);
+  }
+}
