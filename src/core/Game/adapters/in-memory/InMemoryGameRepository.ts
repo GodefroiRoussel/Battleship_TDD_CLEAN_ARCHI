@@ -1,3 +1,4 @@
+import { cloneDeep } from 'lodash';
 import { Game, TypeGame } from '../../domain/entity/game';
 import { IGameRepository } from '../../domain/repository';
 
@@ -11,7 +12,8 @@ export class InMemoryGameRepository implements IGameRepository {
   }
 
   getById(idGame: string): Promise<Game | undefined> {
-    return Promise.resolve(this.games.filter((game) => game.id === idGame)?.[0]);
+    const game = this.games.filter((game) => game.id === idGame)?.[0];
+    return Promise.resolve(cloneDeep(game));
   }
 
   update(game: Game): Promise<Game> {

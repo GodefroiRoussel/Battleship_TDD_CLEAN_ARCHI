@@ -5,8 +5,6 @@ import { PlaceShipUsecase } from '../domain/use-cases/placeShipUsecase';
 import { Coordinate } from '../domain/entity/coordinate';
 import { StubGameBuilder } from '../domain/entity/builder/gameBuilder';
 import { Ship, TYPE_SHIP } from '../domain/entity/ship';
-import { GridBuilder } from '../domain/entity/builder/gridBuilder';
-import { Grid } from '../domain/entity/grid';
 import { DIRECTION } from '../domain/entity/direction';
 
 let game: Game;
@@ -43,22 +41,22 @@ describe('Scenario: During the start of a game, when I am the first player, I wa
       const { coordinatesEnd, direction } = params;
       const ship = new Ship([coordinatesStart, coordinatesEnd], TYPE_SHIP.SUBMARINE);
       const player = game.player1 as Player;
-      const gridExpected = new GridBuilder().withShips([ship]).build();
+      const shipsExpected = [ship];
 
       // Act
       await placeShipUsecase.execute(game.id, player.id, TYPE_SHIP.SUBMARINE, coordinatesStart, direction);
 
       const gameSaved = await inMemoryGameRepository.getById(game.id);
-      const gridAfterShipPlaced = gameSaved?.player1?.grid;
+      const ships = gameSaved?.player1?.ships;
       // Assert
-      expect(gridExpected).toEqual(gridAfterShipPlaced);
+      expect(shipsExpected).toEqual(ships);
     },
   );
 
   it('should not be able to place my ship if another ship already is on one of the coordinate', () => {
     // Arrange
     const ship = new Ship([coordinatesStart, new Coordinate(6, 5)], TYPE_SHIP.SUBMARINE);
-    const player = new Player('id1', 'name1', new Grid([ship]));
+    const player = new Player('id1', 'name1', [ship]);
     const game = new StubGameBuilder().withPlayer1(player).build();
     inMemoryGameRepository = new InMemoryGameRepository([game]);
     placeShipUsecase = new PlaceShipUsecase(inMemoryGameRepository);
@@ -111,14 +109,14 @@ describe('Scenario: During the start of a game, when I am the first player, I wa
     const { coordinates, typeShip } = params;
     const ship = new Ship(coordinates, typeShip);
     const player = game.player1 as Player;
-    const gridExpected = new GridBuilder().withShips([ship]).build();
+    const shipsExpected = [ship];
 
     // Act
     await placeShipUsecase.execute(game.id, player.id, typeShip, coordinatesStart, direction);
 
     const gameSaved = await inMemoryGameRepository.getById(game.id);
-    const gridAfterShipPlaced = gameSaved?.player1?.grid;
+    const ships = gameSaved?.player1?.ships;
     // Assert
-    expect(gridExpected).toEqual(gridAfterShipPlaced);
+    expect(shipsExpected).toEqual(ships);
   });
 });
