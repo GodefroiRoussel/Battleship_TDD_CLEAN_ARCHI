@@ -11,7 +11,12 @@ export enum TYPE_SHIP {
 
 export class Ship {
   private _life: number;
-  constructor(private _coordinates: Coordinate[], private _typeShip: TYPE_SHIP) {
+  constructor(private _coordinates: Coordinate[], private _typeShip: TYPE_SHIP, life?: number) {
+    if (life !== undefined) {
+      this._life = life;
+      return;
+    }
+
     switch (_typeShip) {
       case TYPE_SHIP.SUBMARINE:
         this._life = 2;
@@ -66,7 +71,7 @@ export class Ship {
       tempCoordinate = tempCoordinate.next(direction);
       coordinates.push(tempCoordinate);
     }
-    return new Ship(coordinates, typeShip);
+    return new Ship(coordinates, typeShip, size);
   }
 
   public shot(): void {

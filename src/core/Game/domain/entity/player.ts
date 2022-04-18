@@ -55,4 +55,10 @@ export class Player {
 
     this.listCoordinatesShot.push(new CoordinateShot(coordinate.x, coordinate.y, TYPE_COORDINATE.WATER));
   }
+
+  life(): number {
+    return this._ships.reduce((accumulator: number, ship: Ship) => {
+      return accumulator + ship.life;
+    }, 0);
+  }
 }
