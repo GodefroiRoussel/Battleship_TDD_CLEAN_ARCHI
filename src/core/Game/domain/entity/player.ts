@@ -34,19 +34,20 @@ export class Player {
   }
 
   addShip(typeShip: TYPE_SHIP, coordinatesStart: Coordinate, direction: DIRECTION): void {
-    const ship = Ship.create(coordinatesStart, direction, typeShip);
+    const shipToCreate = Ship.create(coordinatesStart, direction, typeShip);
     this.ships.forEach((shipSaved) => {
-      // TODO: Add a test because this code only works if the overlapse is on one of the 2 first coordinates of the ship
       if (
-        shipSaved.coordinates.some(
-          (coordinate) =>
-            coordinate.equalsLocation(ship.coordinates[0]) || coordinate.equalsLocation(ship.coordinates[1]),
-        )
+        shipSaved.coordinates.some((coordinate) => {
+          return (
+            shipToCreate.coordinates.filter((coordinateToCreate) => coordinate.equalsLocation(coordinateToCreate))
+              .length > 0
+          );
+        })
       ) {
         throw new Error('A ship is already on one of those coordinates');
       }
     });
-    this.ships.push(ship);
+    this.ships.push(shipToCreate);
   }
 
   shot(coordinate: Coordinate, opponent: Player): void {

@@ -53,19 +53,47 @@ describe('Scenario: During the start of a game, when I am the first player, I wa
     },
   );
 
-  it('should not be able to place my ship if another ship already is on one of the coordinate', () => {
-    // Arrange
-    const ship = new Ship([coordinatesStart, new Coordinate(6, 5)], TYPE_SHIP.SUBMARINE);
-    const player = new Player('id1', 'name1', [ship]);
-    const game = new StubGameBuilder().withPlayer1(player).build();
-    inMemoryGameRepository = new InMemoryGameRepository([game]);
-    placeShipUsecase = new PlaceShipUsecase(inMemoryGameRepository);
+  const casesError = [
+    {
+      shipPlaced: new Ship([coordinatesStart, new Coordinate(6, 5)], TYPE_SHIP.SUBMARINE),
+      typeShip: TYPE_SHIP.SUBMARINE,
+      caseTitle: 'overlap a whole ship',
+    },
+    {
+      shipPlaced: new Ship(
+        [new Coordinate(7, 2), new Coordinate(7, 3), new Coordinate(7, 4), new Coordinate(7, 5)],
+        TYPE_SHIP.DESTROYER,
+      ),
+      typeShip: TYPE_SHIP.DESTROYER,
+      caseTitle: 'overlap the last coordinate of a ship',
+    },
+  ].map((testCase) =>
+    Object.assign(testCase, {
+      toString: function (): string {
+        return testCase.caseTitle;
+      },
+    }),
+  );
 
-    // Act & Assert
-    return expect(
-      placeShipUsecase.execute(game.id, player.id, TYPE_SHIP.SUBMARINE, coordinatesStart, direction),
-    ).rejects.toThrowError('A ship is already on one of those coordinates');
-  });
+  test.each(casesError)(
+    'should not be able to place my ship if another ship already is on one of the coordinate. Case: %s',
+    () => {
+      // Arrange
+      const ship = new Ship(
+        [new Coordinate(7, 2), new Coordinate(7, 3), new Coordinate(7, 4), new Coordinate(7, 5)],
+        TYPE_SHIP.DESTROYER,
+      );
+      const player = new Player('id1', 'name1', [ship]);
+      const game = new StubGameBuilder().withPlayer1(player).build();
+      inMemoryGameRepository = new InMemoryGameRepository([game]);
+      placeShipUsecase = new PlaceShipUsecase(inMemoryGameRepository);
+
+      // Act & Assert
+      return expect(
+        placeShipUsecase.execute(game.id, player.id, TYPE_SHIP.CRUISER, coordinatesStart, direction),
+      ).rejects.toThrowError('A ship is already on one of those coordinates');
+    },
+  );
 
   it('should not be able to place a ship outside of the grid', () => {
     // Arrange
