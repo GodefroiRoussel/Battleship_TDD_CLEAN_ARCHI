@@ -1,10 +1,10 @@
-import { CoordinateShot } from '../entity/coordinate';
+import { Coordinate } from '../entity/coordinate';
 import { IGameRepository } from '../repository';
 
 export class GetShotsUsecase {
   constructor(private gameRepository: IGameRepository) {}
 
-  async execute(idGame: string, idPlayer: string): Promise<CoordinateShot[]> {
+  async execute(idGame: string, idPlayer: string): Promise<Coordinate[]> {
     const game = await this.gameRepository.getById(idGame);
     if (!game) {
       throw new Error('Game not found');

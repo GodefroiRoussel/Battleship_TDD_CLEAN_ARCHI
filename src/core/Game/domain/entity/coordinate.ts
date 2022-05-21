@@ -2,9 +2,21 @@ import { DIRECTION } from './direction';
 
 // C'est un value object !
 
+export type CoordinateType = {
+  x: number;
+  y: number;
+  type?: TYPE_COORDINATE;
+};
+
+export enum TYPE_COORDINATE {
+  TOUCHED = 'TOUCHED',
+  WATER = 'WATER',
+  OCCUPIED = 'OCCUPIED',
+}
+
 export const invalidCoordinateError = new Error('Invalid coordinate: each axis should be a number between 0 and 10');
 export class Coordinate {
-  constructor(public readonly x: number, public readonly y: number) {
+  constructor(public readonly x: number, public readonly y: number, public readonly type?: TYPE_COORDINATE) {
     if (!this.isNumberInTheGrid(x) || !this.isNumberInTheGrid(y)) {
       throw invalidCoordinateError;
     }
@@ -17,34 +29,38 @@ export class Coordinate {
   next(direction: DIRECTION): Coordinate {
     switch (direction) {
       case DIRECTION.BOTTOM:
-        return new Coordinate(this.x, this.y - 1);
+        return new Coordinate(this.x, this.y - 1, this.type);
 
       case DIRECTION.TOP:
-        return new Coordinate(this.x, this.y + 1);
+        return new Coordinate(this.x, this.y + 1, this.type);
 
       case DIRECTION.LEFT:
-        return new Coordinate(this.x + -1, this.y);
+        return new Coordinate(this.x + -1, this.y, this.type);
 
       default:
-        return new Coordinate(this.x + 1, this.y);
+        return new Coordinate(this.x + 1, this.y, this.type);
     }
   }
 
-  equals(otherCoordinate: Coordinate): boolean {
+  equalsLocation(otherCoordinate: Coordinate): boolean {
     if (this.x === otherCoordinate.x && this.y === otherCoordinate.y) {
       return true;
     }
     return false;
   }
-}
 
-export enum TYPE_COORDINATE {
-  TOUCHED = 'TOUCHED',
-  WATER = 'WATER',
-}
+  equals(otherCoordinate: Coordinate): boolean {
+    if (this.equalsLocation(otherCoordinate) && this.type === otherCoordinate.type) {
+      return true;
+    }
+    return false;
+  }
 
-export class CoordinateShot extends Coordinate {
-  constructor(public x: number, public y: number, public typeCoordinate: TYPE_COORDINATE) {
-    super(x, y);
+  public toJSON(): CoordinateType {
+    return {
+      x: this.x,
+      y: this.y,
+      type: this.type,
+    };
   }
 }

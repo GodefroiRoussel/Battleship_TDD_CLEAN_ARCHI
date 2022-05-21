@@ -1,6 +1,6 @@
 import { InMemoryGameRepository } from '../adapters/in-memory/InMemoryGameRepository';
 import { StubGameBuilder } from '../domain/entity/builder/gameBuilder';
-import { Coordinate, CoordinateShot, TYPE_COORDINATE } from '../domain/entity/coordinate';
+import { Coordinate, TYPE_COORDINATE } from '../domain/entity/coordinate';
 import { Game } from '../domain/entity/game';
 import { Player } from '../domain/entity/player';
 import { Ship, TYPE_SHIP } from '../domain/entity/ship';
@@ -9,7 +9,7 @@ import { ShotUsecase } from '../domain/use-cases/shotUsecase';
 let game: Game;
 let player: Player;
 let coordinateToShoot: Coordinate;
-let coordinateShot: CoordinateShot;
+let coordinateShot: Coordinate;
 let inMemoryGameRepository: InMemoryGameRepository;
 let shotUsecase: ShotUsecase;
 
@@ -17,7 +17,7 @@ beforeEach(() => {
   game = new StubGameBuilder().build();
   player = game.player1 as Player;
   coordinateToShoot = new Coordinate(5, 5);
-  coordinateShot = new CoordinateShot(5, 5, TYPE_COORDINATE.WATER);
+  coordinateShot = new Coordinate(5, 5, TYPE_COORDINATE.WATER);
   inMemoryGameRepository = new InMemoryGameRepository([game]);
   shotUsecase = new ShotUsecase(inMemoryGameRepository);
 });
@@ -70,7 +70,7 @@ describe('Scenario: During a game, when I am a player, I want to shoot on coordi
     const player1 = game.player1 as Player;
     const inMemoryGameRepository = new InMemoryGameRepository([game]);
     const shotUsecase = new ShotUsecase(inMemoryGameRepository);
-    const expectedCoordinateShot = new CoordinateShot(5, 5, TYPE_COORDINATE.TOUCHED);
+    const expectedCoordinateShot = new Coordinate(5, 5, TYPE_COORDINATE.TOUCHED);
     const expectedLifeShip = 1;
 
     // Act

@@ -1,4 +1,4 @@
-import { Coordinate } from './coordinate';
+import { Coordinate, CoordinateType } from './coordinate';
 import { DIRECTION } from './direction';
 
 // The types of ships are:  Carrier (occupies 5 spaces, Cruiser (4),  Destroyer (3) and Submarine (2).
@@ -8,6 +8,12 @@ export enum TYPE_SHIP {
   CRUISER = 'CRUISER',
   CARRIER = 'CARRIER',
 }
+
+export type ShipType = {
+  _coordinates: CoordinateType[];
+  _typeShip: TYPE_SHIP;
+  life: number;
+};
 
 export class Ship {
   private _life: number;
@@ -76,5 +82,13 @@ export class Ship {
 
   public shot(): void {
     this._life -= 1;
+  }
+
+  public toJSON(): ShipType {
+    return {
+      _coordinates: this._coordinates.map((coordinate) => coordinate.toJSON()),
+      _typeShip: this._typeShip,
+      life: this._life,
+    };
   }
 }

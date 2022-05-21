@@ -1,13 +1,20 @@
-import { Ship, TYPE_SHIP } from './ship';
-import { Coordinate, CoordinateShot, TYPE_COORDINATE } from './coordinate';
+import { Ship, ShipType, TYPE_SHIP } from './ship';
+import { Coordinate, CoordinateType, TYPE_COORDINATE } from './coordinate';
 import { DIRECTION } from './direction';
+
+export type PlayerType = {
+  _id: string;
+  _name: string;
+  _ships: ShipType[];
+  _listCoordinatesShot: CoordinateType[];
+};
 
 export class Player {
   constructor(
     private _id: string,
     private _name: string,
     private _ships: Ship[] = [],
-    private _listCoordinatesShot: CoordinateShot[] = [],
+    private _listCoordinatesShot: Coordinate[] = [],
   ) {}
 
   public get id(): string {
@@ -22,16 +29,18 @@ export class Player {
     return this._ships;
   }
 
-  public get listCoordinatesShot(): CoordinateShot[] {
+  public get listCoordinatesShot(): Coordinate[] {
     return this._listCoordinatesShot;
   }
 
   addShip(typeShip: TYPE_SHIP, coordinatesStart: Coordinate, direction: DIRECTION): void {
     const ship = Ship.create(coordinatesStart, direction, typeShip);
     this.ships.forEach((shipSaved) => {
+      // TODO: Add a test because this code only works if the overlapse is on one of the 2 first coordinates of the ship
       if (
         shipSaved.coordinates.some(
-          (coordinate) => coordinate.equals(ship.coordinates[0]) || coordinate.equals(ship.coordinates[1]),
+          (coordinate) =>
+            coordinate.equalsLocation(ship.coordinates[0]) || coordinate.equalsLocation(ship.coordinates[1]),
         )
       ) {
         throw new Error('A ship is already on one of those coordinates');
@@ -41,24 +50,33 @@ export class Player {
   }
 
   shot(coordinate: Coordinate, opponent: Player): void {
-    if (this.listCoordinatesShot.filter((coordinateShot) => coordinateShot.equals(coordinate)).length > 0) {
+    if (this.listCoordinatesShot.filter((coordinateShot) => coordinateShot.equalsLocation(coordinate)).length > 0) {
       throw new Error('This coordinate has already been shot');
     }
 
     opponent.ships.map((ship) => {
-      if (ship.coordinates.filter((coordinateShip) => coordinateShip.equals(coordinate)).length > 0) {
+      if (ship.coordinates.filter((coordinateShip) => coordinateShip.equalsLocation(coordinate)).length > 0) {
         ship.shot();
-        this.listCoordinatesShot.push(new CoordinateShot(coordinate.x, coordinate.y, TYPE_COORDINATE.TOUCHED));
+        this.listCoordinatesShot.push(new Coordinate(coordinate.x, coordinate.y, TYPE_COORDINATE.TOUCHED));
       }
       return ship;
     });
 
-    this.listCoordinatesShot.push(new CoordinateShot(coordinate.x, coordinate.y, TYPE_COORDINATE.WATER));
+    this.listCoordinatesShot.push(new Coordinate(coordinate.x, coordinate.y, TYPE_COORDINATE.WATER));
   }
 
   life(): number {
     return this._ships.reduce((accumulator: number, ship: Ship) => {
       return accumulator + ship.life;
     }, 0);
+  }
+
+  toJSON(): PlayerType {
+    return {
+      _id: this._id,
+      _name: this._name,
+      _ships: this._ships.map((ship) => ship.toJSON()),
+      _listCoordinatesShot: this._listCoordinatesShot.map((coordinate) => coordinate.toJSON()),
+    };
   }
 }
