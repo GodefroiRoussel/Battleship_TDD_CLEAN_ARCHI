@@ -135,29 +135,30 @@ const PlaceShips = ({
   const [y, setY] = useState(0);
   const [direction, setDirection] = useState(DIRECTION.RIGHT);
 
-  addEventListener('keydown', function (event) {
-    switch (event.key) {
-      case 'ArrowLeft':
-        setX(x - 1);
-        break;
+  useEffect(() => {
+    addEventListener('keydown', function (event) {
+      switch (event.key) {
+        case 'ArrowLeft':
+          setX((x) => x - 1);
+          break;
 
-      case 'ArrowRight':
-        setX(x + 1);
-        break;
+        case 'ArrowRight':
+          setX((x) => x + 1);
+          break;
 
-      case 'ArrowUp':
-        setY(y + 1);
-        break;
+        case 'ArrowUp':
+          setY((y) => y + 1);
+          break;
 
-      case 'ArrowDown':
-        setY(y - 1);
-        break;
+        case 'ArrowDown':
+          setY((y) => y - 1);
+          break;
 
-      default:
-        break;
-    }
-    console.log(`Key: ${event.key} with keycode ${event.keyCode} has been pressed`);
-  });
+        default:
+          break;
+      }
+    });
+  }, []);
 
   if (!player) {
     return <></>;
@@ -283,19 +284,20 @@ const Line = ({
         {columns.map((_, indexColumn) => {
           const currentCoordinate = new Coordinate(indexColumn, indexLine);
           const coordinatesAllShipsPlaced = ships.flatMap((ship) => ship._coordinates);
+          const id = `${indexLine.toString()} ${indexColumn.toString()}`;
           if (isCurrentCoordinateOccupiedAndTryToPlaceCurrentShip()) {
-            return <Cell key={`${indexColumn}`} typeCoordinate={TYPE_COORDINATE_CELL.OVERLAPSE} />;
+            return <Cell key={id} id={id} typeCoordinate={TYPE_COORDINATE_CELL.OVERLAPSE} />;
           }
 
           if (isCurrentCoordinateOccupied()) {
-            return <Cell key={`${indexColumn}`} typeCoordinate={TYPE_COORDINATE_CELL.OCCUPIED} />;
+            return <Cell key={id} id={id} typeCoordinate={TYPE_COORDINATE_CELL.OCCUPIED} />;
           }
 
           if (isCurrentCoordinateToPlaceCurrentShip()) {
-            return <Cell key={`${indexColumn}`} typeCoordinate={TYPE_COORDINATE_CELL.FUTURE} />;
+            return <Cell key={id} id={id} typeCoordinate={TYPE_COORDINATE_CELL.FUTURE} />;
           }
 
-          return <Cell key={`${indexColumn}`} typeCoordinate={TYPE_COORDINATE_CELL.WATER} />;
+          return <Cell key={id} id={id} typeCoordinate={TYPE_COORDINATE_CELL.WATER} />;
 
           function isCurrentCoordinateToPlaceCurrentShip() {
             if (!temporaryShip) {
@@ -340,7 +342,7 @@ const Line = ({
   }
 };
 
-const Cell = ({ key, typeCoordinate }: { key: string; typeCoordinate: TYPE_COORDINATE_CELL }): JSX.Element => {
+const Cell = ({ id, typeCoordinate }: { id: string; typeCoordinate: TYPE_COORDINATE_CELL }): JSX.Element => {
   let text: string;
   let style = {
     border: 'solid',
@@ -374,7 +376,7 @@ const Cell = ({ key, typeCoordinate }: { key: string; typeCoordinate: TYPE_COORD
   }
 
   return (
-    <div key={key} style={style} id={key}>
+    <div key={id} style={style} id={id}>
       {text}
     </div>
   );
