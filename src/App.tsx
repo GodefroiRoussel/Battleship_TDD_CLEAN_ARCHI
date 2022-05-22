@@ -1,12 +1,7 @@
-import Home from "./pages/home";
+import Home from './pages/home';
 
 function App(): JSX.Element {
-  return (
-        <Home />
-  );
+  return <Home />;
 }
-
-
-
 
 export default App;

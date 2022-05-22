@@ -18,6 +18,7 @@ module.exports = {
         'max-len': ['warn', { code: 200 }],
         'react/prop-types': 'warn',
         'react/jsx-props-no-spreading': 'warn',
+        "@typescript-eslint/explicit-module-boundary-types": "off"
         // Place to specify ESLint rules. Can be used to overwrite rules specified from the extended configs
         // e.g. "@typescript-eslint/explicit-function-return-type": "off",
     },
