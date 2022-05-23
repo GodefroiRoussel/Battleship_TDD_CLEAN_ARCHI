@@ -6,6 +6,7 @@ import App from './App';
 import { createStore, RootState } from './store/store';
 import { Provider } from 'react-redux';
 import NewGamePage from './pages/createNewGame';
+import PlayGamePage from './pages/games/playGame';
 import { Counter } from './features/counter/counter';
 import reportWebVitals from './reportWebVitals';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -18,8 +19,10 @@ import { PlaceTemporaryCurrentShipUsecase } from './core/Game/domain/use-cases/p
 import { Game, TypeGame } from './core/Game/domain/entity/game';
 import { Ship, TYPE_SHIP } from './core/Game/domain/entity/ship';
 import { Player } from './core/Game/domain/entity/player';
-import { Coordinate } from './core/Game/domain/entity/coordinate';
+import { Coordinate, TYPE_COORDINATE } from './core/Game/domain/entity/coordinate';
 import { DIRECTION } from './core/Game/domain/entity/direction';
+import { GetGameByIDUsecase } from './core/Game/domain/use-cases/getGameByIDUsecase';
+import { GAME_STEPS } from './features/game/gameSlice';
 
 const ships: Ship[] = [
   new Ship([new Coordinate(0, 0), new Coordinate(1, 0)], TYPE_SHIP.SUBMARINE, 2),
@@ -40,8 +43,14 @@ const inMemoryGameRepository = new InMemoryGameRepository([
   new Game(
     'id1',
     TypeGame.Human_vs_Human,
-    new Player('id1', 'TOTO', ships),
-    new Player('id2', 'TATA', shipsWith1Missing),
+    new Player('id1', 'TOTO', ships, [
+      new Coordinate(0, 0, TYPE_COORDINATE.TOUCHED),
+      new Coordinate(7, 7, TYPE_COORDINATE.WATER),
+    ]),
+    new Player('id2', 'TATA', shipsWith1Missing, [
+      new Coordinate(0, 0, TYPE_COORDINATE.TOUCHED),
+      new Coordinate(7, 7, TYPE_COORDINATE.WATER),
+    ]),
   ),
 ]);
 
@@ -53,8 +62,29 @@ const preloadedState: RootState = {
     error: '',
     currentGame: {
       error: '',
-      game: undefined,
-      step: 'PLAYER_1_TO_SHOOT',
+      game: {
+        _id: 'id1',
+        _type: TypeGame.Human_vs_Human,
+        _player1: {
+          _id: 'id1',
+          _listCoordinatesShot: [
+            new Coordinate(0, 0, TYPE_COORDINATE.TOUCHED).toJSON(),
+            new Coordinate(7, 7, TYPE_COORDINATE.WATER).toJSON(),
+          ],
+          _name: 'TOTO',
+          _ships: ships.map((ship) => ship.toJSON()),
+        },
+        _player2: {
+          _id: 'id2',
+          _listCoordinatesShot: [
+            new Coordinate(0, 0, TYPE_COORDINATE.TOUCHED).toJSON(),
+            new Coordinate(7, 7, TYPE_COORDINATE.WATER).toJSON(),
+          ],
+          _name: 'TATA',
+          _ships: ships.map((ship) => ship.toJSON()),
+        },
+      },
+      step: GAME_STEPS.PLAYER_1_TO_SHOOT,
     },
     creatingGame: {
       step: 'PLACE_SHIPS_PLAYER_2',
@@ -63,7 +93,10 @@ const preloadedState: RootState = {
         _type: TypeGame.Human_vs_Human,
         _player1: {
           _id: 'id1',
-          _listCoordinatesShot: [],
+          _listCoordinatesShot: [
+            new Coordinate(0, 0, TYPE_COORDINATE.TOUCHED).toJSON(),
+            new Coordinate(7, 7, TYPE_COORDINATE.WATER).toJSON(),
+          ],
           _name: 'TOTO',
           _ships: ships.map((ship) => ship.toJSON()),
         },
@@ -91,6 +124,7 @@ const store = createStore({
   placeShipUsecase: new PlaceShipUsecase(inMemoryGameRepository),
   placeTemporaryCurrentShipUsecase: new PlaceTemporaryCurrentShipUsecase(),
   getShipsUsecase: new GetShipsUsecase(inMemoryGameRepository),
+  getGameByIDUsecase: new GetGameByIDUsecase(inMemoryGameRepository),
   preloadedState,
 });
 
@@ -103,6 +137,8 @@ ReactDOM.render(
           <Route path="/" element={<App />} />
           <Route path="new-game" element={<NewGamePage />} />
           <Route path="counter" element={<Counter />} />
+          <Route path="games" element={<div> shit </div>} />
+          <Route path="games/:idGame" element={<PlayGamePage />} />
         </Routes>
       </BrowserRouter>
     </Provider>

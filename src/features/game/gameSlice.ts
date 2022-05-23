@@ -7,11 +7,18 @@ import { Player, PlayerType } from '../../core/Game/domain/entity/player';
 import { ShipType, TYPE_SHIP } from '../../core/Game/domain/entity/ship';
 import { AddPlayerUsecase } from '../../core/Game/domain/use-cases/addPlayerUsecase';
 import { CreateGameUsecase } from '../../core/Game/domain/use-cases/createGameUsecase';
+import { GetGameByIDUsecase } from '../../core/Game/domain/use-cases/getGameByIDUsecase';
 import { GetShipsUsecase } from '../../core/Game/domain/use-cases/getShipsUsecase';
 import { PlaceShipUsecase } from '../../core/Game/domain/use-cases/placeShipUsecase';
 import { PlaceTemporaryCurrentShipUsecase } from '../../core/Game/domain/use-cases/placeTemporaryCurrentShip';
 import { RootState } from '../../store/store';
 
+export enum GAME_STEPS {
+  'PLAYER_1_TO_SHOOT',
+  'PLAYER_2_TO_SHOOT',
+  'HAS_PLAYER_1_WON',
+  'HAS_PLAYER_2_WON',
+}
 export interface GameState {
   ids: string[];
   entities: GameType[];
@@ -25,7 +32,7 @@ export interface GameState {
   };
   currentGame: {
     game: GameType | undefined;
-    step: 'PLAYER_1_TO_SHOOT';
+    step: GAME_STEPS;
     error: string;
   };
 }
@@ -43,7 +50,7 @@ const initialState: GameState = {
   },
   currentGame: {
     game: undefined,
-    step: 'PLAYER_1_TO_SHOOT',
+    step: GAME_STEPS.PLAYER_1_TO_SHOOT,
     error: '',
   },
 };
@@ -132,6 +139,13 @@ export const gameSlice = createSlice({
     builder.addCase(placeTemporaryCurrentShip.rejected, (state, action) => {
       state.creatingGame.error = action.error.message || '';
     });
+    builder.addCase(getGameByID.fulfilled, (state, action) => {
+      state.currentGame.game = action.payload;
+      state.currentGame.error = '';
+    });
+    builder.addCase(getGameByID.rejected, (state, action) => {
+      state.currentGame.error = action.error.message || '';
+    });
   },
 });
 
@@ -205,6 +219,17 @@ export const placeTemporaryCurrentShip = createAsyncThunk<
   },
 );
 
+export const getGameByID = createAsyncThunk<GameType, string, { extra: { getGameByIDUsecase: GetGameByIDUsecase } }>(
+  'game/getByID',
+  async (id, { extra: { getGameByIDUsecase } }) => {
+    try {
+      return (await getGameByIDUsecase.execute(id)).toJSON();
+    } catch (error: unknown) {
+      throw error;
+    }
+  },
+);
+
 export const selectError = (state: RootState): string => state.game.error;
 
 export const selectStepCreatingGame = (state: RootState): string => state.game.creatingGame.step;
@@ -216,11 +241,10 @@ export const selectPlayer2CreatingGame = (state: RootState): PlayerType | undefi
 export const selectErrorCreatingGame = (state: RootState): string => state.game.creatingGame.error;
 export const selectTemporaryShip = (state: RootState): ShipType | undefined => state.game.creatingGame.temporaryShip;
 
-export const selectCurrentGame = (
-  state: RootState,
-): { game: GameType | undefined; error: string; step: 'PLAYER_1_TO_SHOOT' } => state.game.currentGame;
+export const selectCurrentGame = (state: RootState): { game: GameType | undefined; error: string; step: GAME_STEPS } =>
+  state.game.currentGame;
 export const selectGameCurrentGame = (state: RootState): GameType | undefined => state.game.currentGame.game;
-export const selectStepCurrentGame = (state: RootState): string => state.game.currentGame.step;
+export const selectStepCurrentGame = (state: RootState): GAME_STEPS => state.game.currentGame.step;
 export const selectErrorCurrentGame = (state: RootState): string => state.game.currentGame.error;
 
 export default gameSlice.reducer;

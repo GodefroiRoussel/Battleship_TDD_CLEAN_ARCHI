@@ -1,6 +1,7 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import { AddPlayerUsecase } from '../core/Game/domain/use-cases/addPlayerUsecase';
 import { CreateGameUsecase } from '../core/Game/domain/use-cases/createGameUsecase';
+import { GetGameByIDUsecase } from '../core/Game/domain/use-cases/getGameByIDUsecase';
 import { GetShipsUsecase } from '../core/Game/domain/use-cases/getShipsUsecase';
 import { PlaceShipUsecase } from '../core/Game/domain/use-cases/placeShipUsecase';
 import { PlaceTemporaryCurrentShipUsecase } from '../core/Game/domain/use-cases/placeTemporaryCurrentShip';
@@ -13,6 +14,7 @@ export type StoreProps = {
   placeShipUsecase: PlaceShipUsecase;
   placeTemporaryCurrentShipUsecase: PlaceTemporaryCurrentShipUsecase;
   getShipsUsecase: GetShipsUsecase;
+  getGameByIDUsecase: GetGameByIDUsecase;
   preloadedState?: RootState;
 };
 
@@ -27,6 +29,7 @@ export const createStore = ({
   placeShipUsecase,
   placeTemporaryCurrentShipUsecase,
   getShipsUsecase,
+  getGameByIDUsecase,
   preloadedState,
 }: StoreProps) => {
   const store = configureStore({
@@ -40,6 +43,7 @@ export const createStore = ({
             placeShipUsecase,
             placeTemporaryCurrentShipUsecase,
             getShipsUsecase,
+            getGameByIDUsecase,
           },
         },
       }),

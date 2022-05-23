@@ -17,8 +17,8 @@ import {
 } from '../features/game/gameSlice';
 import { PlayerType } from '../core/Game/domain/entity/player';
 import { ShipType, TYPE_SHIP } from '../core/Game/domain/entity/ship';
-import { Coordinate, TYPE_COORDINATE } from '../core/Game/domain/entity/coordinate';
 import { DIRECTION } from '../core/Game/domain/entity/direction';
+import { Grid } from '../components/Grid';
 
 function createNewGame(): JSX.Element {
   const errorNewGame = useAppSelector(selectError);
@@ -109,13 +109,6 @@ const AddPlayer = ({
     </>
   );
 };
-
-enum TYPE_COORDINATE_CELL {
-  WATER = 'WATER',
-  OCCUPIED = 'OCCUPIED',
-  FUTURE = 'FUTURE',
-  OVERLAPSE = 'OVERLAPSE',
-}
 
 const PlaceShips = ({
   idGame,
@@ -251,134 +244,6 @@ const PlaceShips = ({
       <Grid temporaryShip={temporaryShip} ships={player._ships} />
       {errorMsg && <div>Error : {errorMsg}</div>}
     </>
-  );
-};
-
-const Grid = ({ ships, temporaryShip }: { ships: ShipType[]; temporaryShip: ShipType | undefined }): JSX.Element => {
-  const lines = Array(10).fill(undefined);
-  return (
-    <>
-      <div>Grid</div>
-      <div style={{ display: 'flex', flexDirection: 'column-reverse', justifyContent: 'space-around' }}>
-        {lines.map((_, index) => {
-          return <Line key={index} indexLine={index} temporaryShip={temporaryShip} ships={ships} />;
-        })}
-      </div>
-    </>
-  );
-};
-
-const Line = ({
-  indexLine,
-  temporaryShip,
-  ships,
-}: {
-  indexLine: number;
-  ships: ShipType[];
-  temporaryShip: ShipType | undefined;
-}): JSX.Element => {
-  const columns = Array(10).fill(undefined);
-  try {
-    return (
-      <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-around' }}>
-        {columns.map((_, indexColumn) => {
-          const currentCoordinate = new Coordinate(indexColumn, indexLine);
-          const coordinatesAllShipsPlaced = ships.flatMap((ship) => ship._coordinates);
-          const id = `${indexLine.toString()} ${indexColumn.toString()}`;
-          if (isCurrentCoordinateOccupiedAndTryToPlaceCurrentShip()) {
-            return <Cell key={id} id={id} typeCoordinate={TYPE_COORDINATE_CELL.OVERLAPSE} />;
-          }
-
-          if (isCurrentCoordinateOccupied()) {
-            return <Cell key={id} id={id} typeCoordinate={TYPE_COORDINATE_CELL.OCCUPIED} />;
-          }
-
-          if (isCurrentCoordinateToPlaceCurrentShip()) {
-            return <Cell key={id} id={id} typeCoordinate={TYPE_COORDINATE_CELL.FUTURE} />;
-          }
-
-          return <Cell key={id} id={id} typeCoordinate={TYPE_COORDINATE_CELL.WATER} />;
-
-          function isCurrentCoordinateToPlaceCurrentShip() {
-            if (!temporaryShip) {
-              return false;
-            }
-
-            return (
-              temporaryShip._coordinates.filter(
-                (coordinateCurrentShip) =>
-                  coordinateCurrentShip.x === currentCoordinate.x && coordinateCurrentShip.y === currentCoordinate.y,
-              ).length > 0
-            );
-          }
-
-          function isCurrentCoordinateOccupied() {
-            return (
-              coordinatesAllShipsPlaced.filter((coordinateAlreadyPlaced) => {
-                return coordinateAlreadyPlaced.x === indexColumn && coordinateAlreadyPlaced.y === indexLine;
-              }).length === 1
-            );
-          }
-
-          function isCurrentCoordinateOccupiedAndTryToPlaceCurrentShip() {
-            if (!temporaryShip) {
-              return false;
-            }
-
-            return (
-              temporaryShip._coordinates.filter(
-                (coordinateCurrentShip) =>
-                  coordinateCurrentShip.type === TYPE_COORDINATE.OCCUPIED &&
-                  coordinateCurrentShip.x === currentCoordinate.x &&
-                  coordinateCurrentShip.y === currentCoordinate.y,
-              ).length > 0
-            );
-          }
-        })}
-      </div>
-    );
-  } catch (error) {
-    throw new Error('error');
-  }
-};
-
-const Cell = ({ id, typeCoordinate }: { id: string; typeCoordinate: TYPE_COORDINATE_CELL }): JSX.Element => {
-  let text: string;
-  let style = {
-    border: 'solid',
-    width: '100%',
-    display: 'flex',
-    flex: 1,
-    backgroundColor: 'blue',
-    minHeight: '5vh',
-    justifyContent: 'center',
-    alignItems: 'center',
-  };
-  switch (typeCoordinate) {
-    case TYPE_COORDINATE_CELL.OCCUPIED:
-      style = { ...style, backgroundColor: 'grey' };
-      text = TYPE_COORDINATE_CELL.OCCUPIED;
-      break;
-
-    case TYPE_COORDINATE_CELL.FUTURE:
-      style = { ...style, backgroundColor: 'green' };
-      text = TYPE_COORDINATE_CELL.FUTURE;
-      break;
-
-    case TYPE_COORDINATE_CELL.OVERLAPSE:
-      style = { ...style, backgroundColor: 'red' };
-      text = TYPE_COORDINATE_CELL.OVERLAPSE;
-      break;
-
-    default:
-      text = TYPE_COORDINATE_CELL.WATER;
-      break;
-  }
-
-  return (
-    <div key={id} style={style} id={id}>
-      {text}
-    </div>
   );
 };
 
