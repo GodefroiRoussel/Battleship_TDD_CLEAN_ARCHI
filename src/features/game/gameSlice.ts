@@ -9,15 +9,19 @@ import { AddPlayerUsecase } from '../../core/Game/domain/use-cases/addPlayerUsec
 import { CreateGameUsecase } from '../../core/Game/domain/use-cases/createGameUsecase';
 import { GetGameByIDUsecase } from '../../core/Game/domain/use-cases/getGameByIDUsecase';
 import { GetShipsUsecase } from '../../core/Game/domain/use-cases/getShipsUsecase';
+import { HasWonUsecase } from '../../core/Game/domain/use-cases/hasWonUsecase';
 import { PlaceShipUsecase } from '../../core/Game/domain/use-cases/placeShipUsecase';
 import { PlaceTemporaryCurrentShipUsecase } from '../../core/Game/domain/use-cases/placeTemporaryCurrentShip';
+import { ShotUsecase } from '../../core/Game/domain/use-cases/shotUsecase';
 import { RootState } from '../../store/store';
 
 export enum GAME_STEPS {
-  'PLAYER_1_TO_SHOOT',
-  'PLAYER_2_TO_SHOOT',
-  'HAS_PLAYER_1_WON',
-  'HAS_PLAYER_2_WON',
+  'PLAYER_1_TO_SHOOT' = 'PLAYER_1_TO_SHOOT',
+  'PLAYER_2_TO_SHOOT' = 'PLAYER_2_TO_SHOOT',
+  'HAS_PLAYER_1_WON' = 'HAS_PLAYER_1_WON',
+  'HAS_PLAYER_2_WON' = 'HAS_PLAYER_2_WON',
+  'PLAYER_1_WON' = 'PLAYER_1_WON',
+  'PLAYER_2_WON' = 'PLAYER_2_WON',
 }
 export interface GameState {
   ids: string[];
@@ -146,8 +150,47 @@ export const gameSlice = createSlice({
     builder.addCase(getGameByID.rejected, (state, action) => {
       state.currentGame.error = action.error.message || '';
     });
+    builder.addCase(shot.fulfilled, (state, action) => {
+      state.currentGame.step = nextStep(state.currentGame.step);
+      state.currentGame.game = action.payload;
+      state.currentGame.error = '';
+    });
+    builder.addCase(shot.rejected, (state, action) => {
+      state.currentGame.error = action.error.message || '';
+    });
+    builder.addCase(hasWon.fulfilled, (state, action) => {
+      if (action.payload) {
+        if (state.currentGame.step === GAME_STEPS.HAS_PLAYER_1_WON) {
+          state.currentGame.step = GAME_STEPS.PLAYER_1_WON;
+        } else {
+          state.currentGame.step = GAME_STEPS.PLAYER_2_WON;
+        }
+
+        return;
+      }
+
+      state.currentGame.step = nextStep(state.currentGame.step);
+    });
+    builder.addCase(hasWon.rejected, (state, action) => {
+      state.currentGame.error = action.error.message || '';
+    });
   },
 });
+
+function nextStep(step: GAME_STEPS): GAME_STEPS {
+  switch (step) {
+    case GAME_STEPS.PLAYER_1_TO_SHOOT:
+      return GAME_STEPS.HAS_PLAYER_1_WON;
+    case GAME_STEPS.PLAYER_2_TO_SHOOT:
+      return GAME_STEPS.HAS_PLAYER_2_WON;
+    case GAME_STEPS.HAS_PLAYER_1_WON:
+      return GAME_STEPS.PLAYER_2_TO_SHOOT;
+    case GAME_STEPS.HAS_PLAYER_2_WON:
+      return GAME_STEPS.PLAYER_1_TO_SHOOT;
+    default:
+      return GAME_STEPS.PLAYER_1_TO_SHOOT;
+  }
+}
 
 export const createGame = createAsyncThunk<GameType, void, { extra: { createGameUsecase: CreateGameUsecase } }>(
   'game/newGame',
@@ -229,6 +272,32 @@ export const getGameByID = createAsyncThunk<GameType, string, { extra: { getGame
     }
   },
 );
+
+export const shot = createAsyncThunk<
+  GameType,
+  { idGame: string; idPlayer: string; coordinateToShoot: CoordinateType },
+  { extra: { shotUsecase: ShotUsecase; getGameByIDUsecase: GetGameByIDUsecase } }
+>('game/shot', async ({ idGame, idPlayer, coordinateToShoot }, { extra: { shotUsecase, getGameByIDUsecase } }) => {
+  const coordinate = new Coordinate(coordinateToShoot.x, coordinateToShoot.y);
+  try {
+    await shotUsecase.execute(idGame, idPlayer, coordinate);
+    return (await getGameByIDUsecase.execute(idGame)).toJSON();
+  } catch (error: unknown) {
+    throw error;
+  }
+});
+
+export const hasWon = createAsyncThunk<
+  boolean,
+  { idGame: string; idPlayer: string },
+  { extra: { hasWonUsecase: HasWonUsecase; getGameByIDUsecase: GetGameByIDUsecase } }
+>('game/hasWon', async ({ idGame, idPlayer }, { extra: { hasWonUsecase } }) => {
+  try {
+    return hasWonUsecase.execute(idGame, idPlayer);
+  } catch (error: unknown) {
+    throw error;
+  }
+});
 
 export const selectError = (state: RootState): string => state.game.error;
 

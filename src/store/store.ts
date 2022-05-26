@@ -3,8 +3,10 @@ import { AddPlayerUsecase } from '../core/Game/domain/use-cases/addPlayerUsecase
 import { CreateGameUsecase } from '../core/Game/domain/use-cases/createGameUsecase';
 import { GetGameByIDUsecase } from '../core/Game/domain/use-cases/getGameByIDUsecase';
 import { GetShipsUsecase } from '../core/Game/domain/use-cases/getShipsUsecase';
+import { HasWonUsecase } from '../core/Game/domain/use-cases/hasWonUsecase';
 import { PlaceShipUsecase } from '../core/Game/domain/use-cases/placeShipUsecase';
 import { PlaceTemporaryCurrentShipUsecase } from '../core/Game/domain/use-cases/placeTemporaryCurrentShip';
+import { ShotUsecase } from '../core/Game/domain/use-cases/shotUsecase';
 import counterReducer from '../features/counter/counterSlice';
 import gameReducer from '../features/game/gameSlice';
 
@@ -15,6 +17,8 @@ export type StoreProps = {
   placeTemporaryCurrentShipUsecase: PlaceTemporaryCurrentShipUsecase;
   getShipsUsecase: GetShipsUsecase;
   getGameByIDUsecase: GetGameByIDUsecase;
+  shotUsecase: ShotUsecase;
+  hasWonUsecase: HasWonUsecase;
   preloadedState?: RootState;
 };
 
@@ -30,6 +34,8 @@ export const createStore = ({
   placeTemporaryCurrentShipUsecase,
   getShipsUsecase,
   getGameByIDUsecase,
+  shotUsecase,
+  hasWonUsecase,
   preloadedState,
 }: StoreProps) => {
   const store = configureStore({
@@ -44,6 +50,8 @@ export const createStore = ({
             placeTemporaryCurrentShipUsecase,
             getShipsUsecase,
             getGameByIDUsecase,
+            shotUsecase,
+            hasWonUsecase,
           },
         },
       }),

@@ -2,6 +2,7 @@ import { Coordinate, CoordinateType, TYPE_COORDINATE } from '../../core/Game/dom
 import { ShipType } from '../../core/Game/domain/entity/ship';
 
 enum TYPE_COORDINATE_CELL {
+  ALREADY_SHOT = 'ALREADY_SHOT',
   WATER = 'WATER',
   OCCUPIED = 'OCCUPIED',
   FUTURE = 'FUTURE',
@@ -9,6 +10,7 @@ enum TYPE_COORDINATE_CELL {
   PLOUF = 'PLOUF',
   TOUCHED = 'TOUCHED',
   UNKNOWN = 'UNKNOWN',
+  TO_SHOOT = 'TO_SHOOT',
 }
 
 export const Grid = ({
@@ -16,13 +18,16 @@ export const Grid = ({
   coordinatesShot,
   temporaryShip,
   typeGrid,
+  coordinateToShoot,
 }: {
   ships: ShipType[];
   coordinatesShot?: CoordinateType[];
   temporaryShip?: ShipType;
-  typeGrid?: 'ennemy';
+  typeGrid?: 'ennemy' | 'view_all';
+  coordinateToShoot?: CoordinateType;
 }): JSX.Element => {
   const lines = Array(10).fill(undefined);
+
   return (
     <>
       <div>Grid</div>
@@ -36,6 +41,7 @@ export const Grid = ({
               coordinatesShot={coordinatesShot}
               temporaryShip={temporaryShip}
               ships={ships}
+              coordinateToShoot={coordinateToShoot}
             />
           );
         })}
@@ -50,12 +56,14 @@ const Line = ({
   temporaryShip,
   ships,
   typeGrid,
+  coordinateToShoot,
 }: {
   indexLine: number;
   ships: ShipType[];
   coordinatesShot?: CoordinateType[];
   temporaryShip?: ShipType;
-  typeGrid?: 'ennemy';
+  typeGrid?: 'ennemy' | 'view_all';
+  coordinateToShoot?: CoordinateType;
 }): JSX.Element => {
   const columns = Array(10).fill(undefined);
   try {
@@ -65,6 +73,27 @@ const Line = ({
           const currentCoordinate = new Coordinate(indexColumn, indexLine);
           const coordinatesAllShipsPlaced = ships.flatMap((ship) => ship._coordinates);
           const id = `${indexLine.toString()} ${indexColumn.toString()}`;
+
+          if (typeGrid && typeGrid === 'view_all') {
+            if (coordinatesShot) {
+              const currentCoordinateHasBeenShot = isCurrentCoordinateHasBeenShot(coordinatesShot);
+              if (currentCoordinateHasBeenShot) {
+                let typeCell =
+                  currentCoordinateHasBeenShot.type === TYPE_COORDINATE.TOUCHED
+                    ? TYPE_COORDINATE_CELL.TOUCHED
+                    : TYPE_COORDINATE_CELL.WATER;
+                if (typeCell === TYPE_COORDINATE_CELL.WATER) typeCell = TYPE_COORDINATE_CELL.PLOUF;
+                return <Cell key={id} id={id} typeCoordinate={typeCell} />;
+              }
+            }
+          }
+
+          if (coordinateToShoot && isCurrentCoordinate(coordinateToShoot)) {
+            if (coordinatesShot && isCurrentCoordinateHasBeenShot(coordinatesShot)) {
+              return <Cell key={id} id={id} typeCoordinate={TYPE_COORDINATE_CELL.ALREADY_SHOT} />;
+            }
+            return <Cell key={id} id={id} typeCoordinate={TYPE_COORDINATE_CELL.TO_SHOOT} />;
+          }
           if (coordinatesShot) {
             const currentCoordinateHasBeenShot = isCurrentCoordinateHasBeenShot(coordinatesShot);
             if (currentCoordinateHasBeenShot) {
@@ -93,6 +122,10 @@ const Line = ({
           }
 
           return <Cell key={id} id={id} typeCoordinate={TYPE_COORDINATE_CELL.WATER} />;
+
+          function isCurrentCoordinate(coordinateToShoot: CoordinateType) {
+            return coordinateToShoot.x === currentCoordinate.x && coordinateToShoot.y === currentCoordinate.y;
+          }
 
           function isCurrentCoordinateToPlaceCurrentShip() {
             if (!temporaryShip) {
@@ -156,6 +189,10 @@ const Cell = ({ id, typeCoordinate }: { id: string; typeCoordinate: TYPE_COORDIN
     alignItems: 'center',
   };
   switch (typeCoordinate) {
+    case TYPE_COORDINATE_CELL.ALREADY_SHOT:
+      style = { ...style, backgroundColor: 'purple' };
+      text = TYPE_COORDINATE_CELL.ALREADY_SHOT;
+      break;
     case TYPE_COORDINATE_CELL.UNKNOWN:
       style = { ...style, backgroundColor: 'grey' };
       text = TYPE_COORDINATE_CELL.UNKNOWN;
@@ -168,6 +205,10 @@ const Cell = ({ id, typeCoordinate }: { id: string; typeCoordinate: TYPE_COORDIN
     case TYPE_COORDINATE_CELL.FUTURE:
       style = { ...style, backgroundColor: 'green' };
       text = TYPE_COORDINATE_CELL.FUTURE;
+      break;
+    case TYPE_COORDINATE_CELL.TO_SHOOT:
+      style = { ...style, backgroundColor: 'green' };
+      text = TYPE_COORDINATE_CELL.TO_SHOOT;
       break;
 
     case TYPE_COORDINATE_CELL.TOUCHED:

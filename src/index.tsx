@@ -23,8 +23,18 @@ import { Coordinate, TYPE_COORDINATE } from './core/Game/domain/entity/coordinat
 import { DIRECTION } from './core/Game/domain/entity/direction';
 import { GetGameByIDUsecase } from './core/Game/domain/use-cases/getGameByIDUsecase';
 import { GAME_STEPS } from './features/game/gameSlice';
+import { ShotUsecase } from './core/Game/domain/use-cases/shotUsecase';
+import { HasWonUsecase } from './core/Game/domain/use-cases/hasWonUsecase';
 
 const ships: Ship[] = [
+  new Ship([new Coordinate(0, 0), new Coordinate(1, 0)], TYPE_SHIP.SUBMARINE, 2),
+  Ship.create(new Coordinate(0, 1), DIRECTION.RIGHT, TYPE_SHIP.DESTROYER),
+  Ship.create(new Coordinate(0, 2), DIRECTION.RIGHT, TYPE_SHIP.CRUISER),
+  Ship.create(new Coordinate(0, 3), DIRECTION.RIGHT, TYPE_SHIP.CRUISER),
+  Ship.create(new Coordinate(0, 4), DIRECTION.RIGHT, TYPE_SHIP.CARRIER),
+];
+
+const ships2: Ship[] = [
   new Ship([new Coordinate(0, 0), new Coordinate(1, 0)], TYPE_SHIP.SUBMARINE, 2),
   Ship.create(new Coordinate(0, 1), DIRECTION.RIGHT, TYPE_SHIP.DESTROYER),
   Ship.create(new Coordinate(0, 2), DIRECTION.RIGHT, TYPE_SHIP.CRUISER),
@@ -39,17 +49,21 @@ const shipsWith1Missing: Ship[] = [
   Ship.create(new Coordinate(0, 3), DIRECTION.RIGHT, TYPE_SHIP.CRUISER),
 ];
 
+const oneShip: Ship[] = [new Ship([new Coordinate(0, 0), new Coordinate(1, 0)], TYPE_SHIP.SUBMARINE, 2)];
+
 const inMemoryGameRepository = new InMemoryGameRepository([
   new Game(
     'id1',
     TypeGame.Human_vs_Human,
     new Player('id1', 'TOTO', ships, [
-      new Coordinate(0, 0, TYPE_COORDINATE.TOUCHED),
+      // new Coordinate(0, 0, TYPE_COORDINATE.TOUCHED),
+      // new Coordinate(1, 0, TYPE_COORDINATE.TOUCHED),
       new Coordinate(7, 7, TYPE_COORDINATE.WATER),
     ]),
-    new Player('id2', 'TATA', shipsWith1Missing, [
-      new Coordinate(0, 0, TYPE_COORDINATE.TOUCHED),
+    new Player('id2', 'TATA', ships2, [
+      // new Coordinate(0, 0, TYPE_COORDINATE.TOUCHED),
       new Coordinate(7, 7, TYPE_COORDINATE.WATER),
+      new Coordinate(8, 8, TYPE_COORDINATE.WATER),
     ]),
   ),
 ]);
@@ -68,7 +82,9 @@ const preloadedState: RootState = {
         _player1: {
           _id: 'id1',
           _listCoordinatesShot: [
-            new Coordinate(0, 0, TYPE_COORDINATE.TOUCHED).toJSON(),
+            // new Coordinate(0, 0, TYPE_COORDINATE.TOUCHED).toJSON(),
+            // new Coordinate(1, 0, TYPE_COORDINATE.TOUCHED).toJSON(),
+
             new Coordinate(7, 7, TYPE_COORDINATE.WATER).toJSON(),
           ],
           _name: 'TOTO',
@@ -77,11 +93,12 @@ const preloadedState: RootState = {
         _player2: {
           _id: 'id2',
           _listCoordinatesShot: [
-            new Coordinate(0, 0, TYPE_COORDINATE.TOUCHED).toJSON(),
+            // new Coordinate(0, 0, TYPE_COORDINATE.TOUCHED).toJSON(),
+            // new Coordinate(1, 0, TYPE_COORDINATE.TOUCHED).toJSON(),
             new Coordinate(7, 7, TYPE_COORDINATE.WATER).toJSON(),
           ],
           _name: 'TATA',
-          _ships: ships.map((ship) => ship.toJSON()),
+          _ships: ships2.map((ship) => ship.toJSON()),
         },
       },
       step: GAME_STEPS.PLAYER_1_TO_SHOOT,
@@ -125,6 +142,8 @@ const store = createStore({
   placeTemporaryCurrentShipUsecase: new PlaceTemporaryCurrentShipUsecase(),
   getShipsUsecase: new GetShipsUsecase(inMemoryGameRepository),
   getGameByIDUsecase: new GetGameByIDUsecase(inMemoryGameRepository),
+  shotUsecase: new ShotUsecase(inMemoryGameRepository),
+  hasWonUsecase: new HasWonUsecase(inMemoryGameRepository),
   preloadedState,
 });
 
