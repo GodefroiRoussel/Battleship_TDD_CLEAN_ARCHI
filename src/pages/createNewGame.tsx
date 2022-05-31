@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../hooks';
 import {
@@ -128,8 +128,24 @@ const PlaceShips = ({
   const [y, setY] = useState(0);
   const [direction, setDirection] = useState(DIRECTION.RIGHT);
 
-  useEffect(() => {
-    addEventListener('keydown', function (event) {
+  if (!player) {
+    return <></>;
+  }
+
+  const placeShipAction = () => {
+    dispatch(
+      placeShip({
+        idGame,
+        idPlayer: player._id,
+        typeShip: typeShip,
+        coordinatesStart: { x, y },
+        direction: direction,
+      }),
+    );
+  };
+
+  const handleUserKeyPress = useCallback(
+    (event) => {
       switch (event.key) {
         case 'ArrowLeft':
           setX((x) => x - 1);
@@ -147,15 +163,24 @@ const PlaceShips = ({
           setY((y) => y - 1);
           break;
 
+        case 'Enter':
+          placeShipAction();
+          break;
+
         default:
           break;
       }
-    });
-  }, []);
+    },
+    [x, y, player],
+  );
 
-  if (!player) {
-    return <></>;
-  }
+  useEffect(() => {
+    addEventListener('keydown', handleUserKeyPress);
+    return () => {
+      removeEventListener('keydown', handleUserKeyPress);
+    };
+  }, [x, y, player]);
+
   let typeShip: TYPE_SHIP;
   switch (player._ships.length) {
     case 1:
@@ -226,21 +251,7 @@ const PlaceShips = ({
         onChange={() => setDirection(DIRECTION.TOP)}
       />
       <label htmlFor="TOP">TOP</label>
-      <button
-        onClick={() =>
-          dispatch(
-            placeShip({
-              idGame,
-              idPlayer: player._id,
-              typeShip: typeShip,
-              coordinatesStart: { x, y },
-              direction: direction,
-            }),
-          )
-        }
-      >
-        Add ship
-      </button>
+      <button onClick={() => placeShipAction()}>Add ship</button>
       <Grid temporaryShip={temporaryShip} ships={player._ships} />
       {errorMsg && <div>Error : {errorMsg}</div>}
     </>
